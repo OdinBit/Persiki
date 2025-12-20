@@ -6,11 +6,14 @@ public class PlayerMoveFsm
 {
     private StateMachine _fsm;
     private PlayerMovementData _playerMovementFsmData;
-    private Action<Vector2> _moveToDirectionMethod;
+    private Action<Rigidbody2D, Vector2> _moveToDirectionMethod;
 
-    public PlayerMoveFsm(Action<Vector2> MoveToDir)
+    Rigidbody2D _player_rb; // temp
+
+    public PlayerMoveFsm(Action<Rigidbody2D, Vector2> MoveToDir, Rigidbody2D player_rb)
     {
         _moveToDirectionMethod = MoveToDir;
+        _player_rb = player_rb;
 
         _fsm = new StateMachine();
 
@@ -50,7 +53,7 @@ public class PlayerMoveFsm
     private void FsmIdleState()
     {
         //Debug.Log("Idle onLogic");
-        _moveToDirectionMethod(Vector2.zero);
+        _moveToDirectionMethod(_player_rb, Vector2.zero);
     }
 
     private void FsmIdleStateExit()
@@ -66,7 +69,7 @@ public class PlayerMoveFsm
     private void FsmMoveState()
     {
         //Debug.Log("Move onLogic");
-        _moveToDirectionMethod(_playerMovementFsmData.Direction);
+        _moveToDirectionMethod(_player_rb, _playerMovementFsmData.Direction);
     }
 
     private void FsmMoveStateExit()
