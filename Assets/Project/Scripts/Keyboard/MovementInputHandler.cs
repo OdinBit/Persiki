@@ -1,35 +1,38 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Windows;
+using Zenject;
 
-public class MovementInputHandler : MonoBehaviour
+public class MovementInputHandler : IKeyboardMoveInputService, ITickable, System.IDisposable
 {
-    private IMovable _movable;
-    private GameInput _gameInput;
+    private GameInput   _gameInput;
+    private Vector2     _moveDirection;
 
-    public void Awake()
+    public MovementInputHandler(GameInput gameInput)
     {
-        _movable = GetComponentInParent<IMovable>();
-        _gameInput = new GameInput();
+        _moveDirection = Vector2.zero;
+        _gameInput = gameInput;
         _gameInput.Enable();
        
     }
-    private void OnDestroy()
+    public void Dispose() => _gameInput.Dispose();
+
+
+    public void Tick()
     {
-        _gameInput.Dispose();
+        ReadMoveDirection();
     }
 
-
-    private void Update()
-    {
-        if (_movable != null) ReadDirection();
-        else Debug.Log("IMovable not found in parent objects!");
-    }
-
-    private void ReadDirection()
+    private void ReadMoveDirection()
     {
         var direction = _gameInput.Gameplay.Movement.ReadValue<Vector2>();
-        _movable.MoveEvent(direction);
+        _moveDirection = direction;
+    }
+
+    public Vector2 GetMoveDirection()
+    {
+        return _moveDirection;
     }
 }

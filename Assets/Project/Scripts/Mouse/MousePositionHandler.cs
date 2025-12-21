@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Zenject;
 
-public class MousePositionHandler : IService, ITickable
+public class MousePositionHandler : ITickable
 {
     private Vector3 _worldPos;
 

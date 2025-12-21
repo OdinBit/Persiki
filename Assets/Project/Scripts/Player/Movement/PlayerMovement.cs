@@ -1,26 +1,16 @@
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : IMovementService
 {
     [SerializeField] private float _speed = 5f;
-    [SerializeField] private Vector2 _direction;
-    [SerializeField] private Rigidbody2D _rigidbody;
 
-    public void Initialize()
+    public PlayerMovement(float speed)
     {
-        Debug.Log("Player movement Init");
-        _rigidbody = GetComponentInParent<Rigidbody2D>();
+        _speed = speed;
+        Debug.Log("PlayerMovement initialized");
     }
-    public void MoveToDirection(Vector2 direction)
+    public void MoveToDirection(Rigidbody2D rigidbody, Vector2 direction)
     {
-        _direction = direction;
-    }
-    private void MoveInternal()
-    {
-        _rigidbody.velocity = _direction * _speed;
-    }
-    private void FixedUpdate()
-    {
-        if (_rigidbody != null) MoveInternal();
+        if (rigidbody != null && direction != null) rigidbody.velocity = direction * _speed;
     }
 }
