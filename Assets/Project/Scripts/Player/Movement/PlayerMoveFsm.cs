@@ -4,14 +4,18 @@ using UnityHFSM;
 
 public class PlayerMoveFsm
 {
-    private StateMachine              _fsm;
-    private PlayerMovementData        _playerMovementFsmData;
-    private readonly IMovementService _movementService;
-    private readonly Rigidbody2D _player_rb;
+    private StateMachine                        _fsm;
+    private PlayerMovementData                  _playerMovementFsmData;
+    private readonly IMovementService           _movementService;
+    private readonly IKeyboardMoveInputService  _keyboardMoveInputService;
+    private readonly Rigidbody2D                _player_rb;
 
-    public PlayerMoveFsm(IMovementService movementService, Rigidbody2D player_rb)
+    public PlayerMoveFsm(   IKeyboardMoveInputService keyboardMoveInputService, 
+                            IMovementService movementService, 
+                            Rigidbody2D player_rb)
     {
         _movementService = movementService;
+        _keyboardMoveInputService = keyboardMoveInputService;
         _player_rb = player_rb;
 
         _fsm = new StateMachine();
@@ -36,10 +40,11 @@ public class PlayerMoveFsm
 
     public void FsmRun()
     {
+        PlayerMoveDirectionUpdate(_keyboardMoveInputService.GetMoveDirection());
         _fsm.OnLogic();
     }
 
-    public void PlayerDirectionUpdate( Vector2 dir )
+    public void PlayerMoveDirectionUpdate( Vector2 dir )
     {
         _playerMovementFsmData.Direction = dir;
     }
@@ -94,75 +99,3 @@ public class PlayerMoveFsm
         return isTransitionAllowed;
     }
 }
-
-//void Start()
-//{
-
-
-//    fsm.SetStartState("Idle");
-//    fsm.AddState("Idle", onLogic: state => { Debug.Log("Idle state"); });
-//    fsm.AddState("Walk", onLogic: state => { Debug.Log("Walk state"); });
-//    fsm.AddState("Attack", onLogic: state => { Debug.Log("Attack state"); });
-//    fsm.AddState("GetDamage", onLogic: state => { Debug.Log("GetDamage state"); });
-//    fsm.AddState("Death", onLogic: state => { Debug.Log("Death state"); });
-
-
-//    fsm.AddTransition("Idle", "Walk",
-//        transition => Input.GetKeyDown(KeyCode.W));
-//    fsm.AddTransition("Walk", "Idle",
-//        transition => Input.GetKeyUp(KeyCode.W));
-
-//    fsm.AddTransition("Idle", "Attack",
-//        transition => Input.GetMouseButtonDown(0));
-//    fsm.AddTransition("Attack", "Idle",
-//        transition => !Input.anyKey);
-
-//    fsm.AddTransition("Idle", "GetDamage",
-//        transition => ShoodTakeDamage());
-//    fsm.AddTransition("GetDamage", "Death",
-//        transition => Die());
-//    fsm.AddTransition("GetDamage", "Idle",
-//        transition => !ShoodTakeDamage());
-
-//    fsm.AddTransition("Walk", "GetDamage",
-//        transition => ShoodTakeDamage());
-//    fsm.AddTransition("GetDamage","Walk", 
-//        transition => Input.GetKeyDown(KeyCode.W));
-
-//    fsm.AddTransition("Walk", "Attack",
-//        transition => Input.GetMouseButtonDown(0));
-//    fsm.AddTransition("Attack","Walk",
-//        transition => Input.GetKey(KeyCode.W)); 
-
-//    fsm.AddTransition("Attack", "GetDamage",
-//        transition => ShoodTakeDamage());
-//    fsm.AddTransition("GetDamage","Attack", 
-//        transition => !ShoodTakeDamage() && Input.GetMouseButton(0));
-
-//    fsm.Init();
-//}
-//void Update()
-//{
-//    fsm.OnLogic();
-//}
-
-//bool ShoodTakeDamage()
-//{
-//    if (Input.GetKeyDown(KeyCode.D))
-//    {
-//        Debug.Log("Player took damage");
-//        HP -= 50;
-//        return true;
-//    }
-//    else return false;
-//}
-
-//bool Die()
-//{
-//    if (HP <= 0)
-//    {
-//        Debug.Log("Player died");
-//        return true;
-//    }
-//    else return false;
-//}
