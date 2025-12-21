@@ -4,30 +4,35 @@ using CustomEventBus.Signals;
 using Zenject;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class Player : MonoBehaviour, IDamageable, IMovable, IService
+public class Player : MonoBehaviour, IMovable, IService
 {
     private PlayerMoveFsm       _playerFsm;
     private PlayerAttackFsm     _playerAttackFsm;
     private IMovementService    _movementService;
     private EventBus            _eventBus;
+    private Rigidbody2D         _rb2d;    
 
     [Inject]
     public void Construct(EventBus eventBus, IMovementService movementService)
     {
         _eventBus = eventBus;
-        Debug.Log("Player Init");
         _movementService = movementService;
-
-        _playerFsm = new PlayerMoveFsm(_movementService.MoveToDirection, GetComponent<Rigidbody2D>());
+        _rb2d = GetComponent<Rigidbody2D>();
+        _playerFsm = new PlayerMoveFsm(_movementService, _rb2d);
         _playerAttackFsm = new PlayerAttackFsm(_eventBus);
 
         _eventBus.Subscribe<MouseAttackInputSignal>(AttackEventHandler);
+        Debug.Log("Player initialized");
     }
 
     private void Update()
     {
-        _playerFsm.FsmRun();
         _playerAttackFsm.FsmRun();
+    }
+
+    private void FixedUpdate()
+    {
+        _playerFsm.FsmRun();
     }
 
     public void MoveEvent(Vector2 direction)
@@ -37,11 +42,6 @@ public class Player : MonoBehaviour, IDamageable, IMovable, IService
     public void AttackEventHandler(MouseAttackInputSignal signal)
     {
         _playerAttackFsm.TargetPositionUpdate(signal.worldPos);
-    }
-
-    public void TakeDamage(int damage)
-    {
-        Debug.Log("Player take damage");
     }
 
     public Vector2 GetPlayerPosition()
