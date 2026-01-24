@@ -6,7 +6,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Zenject;
 
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour, 
+                     IHealthHolder, 
+                     IDamageable
 {
     [SerializeField] private int _health = 3;
     [SerializeField] private Color _hitColor = Color.red;
@@ -14,13 +16,14 @@ public class Enemy : MonoBehaviour
 
     private SpriteRenderer _spriteRenderer;
     private EnemyMovement _enemyMovement;
-    private EventBus _eventBus;
     private Color _defaultColor;
 
+    public int HealthPoints { get; set; }
+
     [Inject]
-    public void Init(EventBus eventBus)
+    public void Construct()
     {
-        _eventBus = eventBus;
+
     }
 
     private void Start()
@@ -33,7 +36,6 @@ public class Enemy : MonoBehaviour
         _enemyMovement = GetComponent<EnemyMovement>();
         _enemyMovement.Init();
 
-        _eventBus.Subscribe<EnemyDamagedSignal>(OnEnemyGetDamage);
         _defaultColor = _spriteRenderer.color;
     }
     private void Update()
@@ -41,11 +43,8 @@ public class Enemy : MonoBehaviour
 
     }
 
-    private void OnEnemyGetDamage(EnemyDamagedSignal signal)
+    public void OnDamage()
     {
-        if (signal.Enemy != this) return;
-        if (_health > 0) _health -= signal.Health;
-
         _enemyMovement.Knockback();
 
         StartCoroutine(Flash());
