@@ -8,12 +8,12 @@ using Zenject;
 public class Arrow : MonoBehaviour
 {
     // Start is called before the first frame update
-    private EventBus _eventBus;
+    private IDamageSystem   _damageSystem;
 
     [Inject]
-    public void Init(EventBus eventBus)
+    public void Construct(IDamageSystem damageSystem)
     {
-        _eventBus = eventBus;
+        _damageSystem   = damageSystem;
     }
     void Start()
     {
@@ -27,9 +27,15 @@ public class Arrow : MonoBehaviour
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.TryGetComponent<Enemy>(out var enemy))
+        if (collision.TryGetComponent<IDamageable>(out var target))
         {
-            _eventBus.Invoke(new EnemyDamagedSignal(enemy, 1));
+            DamageInfo damageInfo = new DamageInfo()
+            {
+                damage = 0,
+                damageType = 0,
+                attacker = this.gameObject
+            };
+            _damageSystem.DealDamage(target, damageInfo);
         }
     }
 }

@@ -11,12 +11,14 @@ public abstract class Weapon : MonoBehaviour
     protected EventBus _eventBus;
     protected Animator _animator;
     protected DiContainer _container;
+    protected IDamageSystem _damageSystem;
 
     [Inject]
-    public void Init(EventBus eventBus, DiContainer container)
+    public void Init(EventBus eventBus, DiContainer container, IDamageSystem damageSystem)
     {
         _container = container;
         _eventBus = eventBus;
+        _damageSystem = damageSystem;
     }
     protected void InitWeapon()
     {
