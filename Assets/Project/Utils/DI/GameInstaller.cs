@@ -14,7 +14,7 @@ public class GameInstaller : MonoInstaller
     private void BindDamageSystem()
     {
         Container
-            .Bind<IDamageSystem>()
+            .Bind<IDamageService>()
             .To<DamageSystem>()
             .AsSingle();
     }
@@ -22,7 +22,7 @@ public class GameInstaller : MonoInstaller
     private void BindHealthSystem()
     {
         Container
-            .Bind<IHealthSystem>()
+            .Bind<IHealthService>()
             .To<HealthSystem>()
             .AsSingle();
     }

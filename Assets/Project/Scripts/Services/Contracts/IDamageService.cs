@@ -8,7 +8,7 @@ public struct DamageInfo
     public int damageType;
     public GameObject attacker;
 }
-public interface IDamageSystem
+public interface IDamageService
 {
     void DealDamage(IDamageable targe, DamageInfo info);
 }

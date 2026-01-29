@@ -8,10 +8,10 @@ using Zenject;
 public class Arrow : MonoBehaviour
 {
     // Start is called before the first frame update
-    private IDamageSystem   _damageSystem;
+    private IDamageService   _damageSystem;
 
     [Inject]
-    public void Construct(IDamageSystem damageSystem)
+    public void Construct(IDamageService damageSystem)
     {
         _damageSystem   = damageSystem;
     }
