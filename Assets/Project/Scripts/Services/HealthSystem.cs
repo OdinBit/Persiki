@@ -2,7 +2,7 @@ using Zenject;
 using UnityEngine;
 using System;
 
-public class HealthSystem : IHealthSystem
+public class HealthSystem : IHealthService
 {
     public HealthSystem()
     {
