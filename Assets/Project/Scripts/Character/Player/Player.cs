@@ -1,49 +1,45 @@
 using UnityEngine;
-using CustomEventBus;
-using CustomEventBus.Signals;
 using Zenject;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Player : MonoBehaviour
 {
-    private PlayerMoveFsm               _playerFsm;
-    private PlayerAttackFsm             _playerAttackFsm;
-    private IMovementService            _movementService;
-    private IKeyboardMoveInputService   _keyboardMoveInputService;
-    private EventBus                    _eventBus;
-    private Rigidbody2D                 _rb2d;    
+    private EcsWorld _world;
+    private EcsEntity _entity;
+    private Rigidbody2D _rb2d;
 
     [Inject]
-    public void Construct(  EventBus                    eventBus, 
-                            IMovementService            movementService,
-                            IKeyboardMoveInputService   keyboardMoveInputService)
+    public void Construct(EcsWorld world)
     {
-        _eventBus = eventBus;
-        _movementService = movementService;
-        _keyboardMoveInputService = keyboardMoveInputService;
+        _world = world;
+    }
+
+    private void Awake()
+    {
         _rb2d = GetComponent<Rigidbody2D>();
-        _playerFsm = new PlayerMoveFsm(_keyboardMoveInputService, _movementService, _rb2d);
-        _playerAttackFsm = new PlayerAttackFsm(_eventBus);
-
-        _eventBus.Subscribe<MouseAttackInputSignal>(AttackEventHandler);
-        Debug.Log("Player initialized");
     }
 
-    private void Update()
+    private void Start()
     {
-        _playerAttackFsm.FsmRun();
+        if (_world == null) return;
+
+        _entity = _world.CreateEntity();
+        _world.Add(_entity, new PlayerTag());
+        _world.Add(_entity, new Rigidbody2DComponent { Value = _rb2d });
+        _world.Add(_entity, new PlayerMovementData { Direction = Vector2.zero, IsMoving = false });
+        _world.Add(_entity, new PlayerAttackData { AttackStatus = EAttackStatus.Finished, HasTarget = false });
     }
 
-    private void FixedUpdate()
+    private void OnDestroy()
     {
-        _playerFsm.FsmRun();
+        if (_world != null && _entity.IsValid)
+        {
+            _world.DestroyEntity(_entity);
+        }
     }
-    public void AttackEventHandler(MouseAttackInputSignal signal)
-    {
-        _playerAttackFsm.TargetPositionUpdate(signal.worldPos);
-    }
+
     public Vector2 GetPlayerPosition()
     {
-        return (Vector2)gameObject.transform.position;
+        return (Vector2)transform.position;
     }
 }
