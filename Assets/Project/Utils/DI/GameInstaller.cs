@@ -6,24 +6,26 @@ public class GameInstaller : MonoInstaller
 {
     public override void InstallBindings()
     {
-        BindDamageSystem();
+        BindDamageService();
         BindEventBus();
-        BindHealthSystem();
+        BindHealthService();
+        BindCombatService();
+        BindEcs();
     }
 
-    private void BindDamageSystem()
+    private void BindDamageService()
     {
         Container
             .Bind<IDamageService>()
-            .To<DamageSystem>()
+            .To<DamageService>()
             .AsSingle();
     }
 
-    private void BindHealthSystem()
+    private void BindHealthService()
     {
         Container
             .Bind<IHealthService>()
-            .To<HealthSystem>()
+            .To<HealthService>()
             .AsSingle();
     }
 
@@ -32,6 +34,45 @@ public class GameInstaller : MonoInstaller
         Container
             .Bind<EventBus>()
             .FromNew()
+            .AsSingle();
+    }
+
+    private void BindCombatService()
+    {
+        Container
+            .Bind<ICombatService>()
+            .To<CombatService>()
+            .AsTransient();
+    }
+
+    private void BindEcs()
+    {
+        Container
+            .Bind<EcsWorld>()
+            .AsSingle();
+
+        Container
+            .Bind<PlayerMoveInputSystem>()
+            .AsSingle();
+
+        Container
+            .Bind<PlayerMovementSystem>()
+            .AsSingle();
+
+        Container
+            .Bind<PlayerAttackInputSystem>()
+            .AsSingle();
+
+        Container
+            .Bind<PlayerAttackSystem>()
+            .AsSingle();
+
+        Container
+            .BindInterfacesTo<EcsUpdateLoop>()
+            .AsSingle();
+
+        Container
+            .BindInterfacesTo<EcsFixedLoop>()
             .AsSingle();
     }
 }

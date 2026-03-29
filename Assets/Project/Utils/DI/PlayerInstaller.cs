@@ -22,7 +22,7 @@ public class PlayerInstaller : MonoInstaller
     {
         Container
             .Bind<IMovementService>()
-            .To<PlayerMovement>()
+            .To<MovementService>()
             .AsTransient()
             .WithArguments(playerSpeed);
     }

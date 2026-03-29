@@ -8,5 +8,5 @@ using System.Threading.Tasks;
 public interface IHealthHolder
 {
     int HealthPoints { get; set; }
-    void OnDamage(); // temporary !!!
+    void OnDamage(); // temporary!!! it will be implement IDamageable interface. Current interface must be used for UI health bar
 }

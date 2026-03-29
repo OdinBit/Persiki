@@ -8,6 +8,7 @@ public class InputInstaller : MonoInstaller
         BindGameInput();
         BindMousePositionHandler();
         BindKeyboardMoveInputHandler();
+        BindMouseAttackInputSystem();
 
     }
     private void BindGameInput()
@@ -17,10 +18,18 @@ public class InputInstaller : MonoInstaller
             .AsSingle()
             .NonLazy();
     }
+    private void BindMouseAttackInputSystem()
+    {
+        Container
+             .Bind<IMouseAttackInputService>()
+             .To<MouseAttackInputService>()
+             .AsSingle()
+             .NonLazy();
+    }
     private void BindKeyboardMoveInputHandler()
     {
         Container
-            .BindInterfacesTo<MovementInputHandler>()
+            .BindInterfacesTo<MovementInputService>()
             .AsSingle()
             .NonLazy();
     }
