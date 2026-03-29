@@ -17,9 +17,9 @@ public class PlayerAttackSystem : IEcsSystem, System.IDisposable
     {
         if (_attackFinished)
         {
-            foreach (var entity in world.Query<PlayerTag, PlayerAttackData>())
+            foreach (var entity in world.Query<PlayerTag, CombatComponent>())
             {
-                var data = world.Get<PlayerAttackData>(entity);
+                var data = world.Get<CombatComponent>(entity);
                 data.AttackStatus = EAttackStatus.Finished;
                 data.HasTarget = false;
                 world.Set(entity, data);
@@ -27,9 +27,9 @@ public class PlayerAttackSystem : IEcsSystem, System.IDisposable
             _attackFinished = false;
         }
 
-        foreach (var entity in world.Query<PlayerTag, PlayerAttackData>())
+        foreach (var entity in world.Query<PlayerTag, CombatComponent>())
         {
-            var data = world.Get<PlayerAttackData>(entity);
+            var data = world.Get<CombatComponent>(entity);
             if (!data.HasTarget) continue;
             if (data.AttackStatus == EAttackStatus.InProgress) continue;
 

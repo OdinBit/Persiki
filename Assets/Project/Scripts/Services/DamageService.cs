@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DamageSystem : IDamageService
+public class DamageService : IDamageService
 {
     readonly IHealthService _healthSystem;
-    public DamageSystem(IHealthService healthSystem)
+    public DamageService(IHealthService healthSystem)
     {
         _healthSystem = healthSystem;
     }

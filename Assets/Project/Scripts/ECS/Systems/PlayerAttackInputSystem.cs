@@ -17,9 +17,9 @@ public class PlayerAttackInputSystem : IEcsSystem, IDisposable
     {
         if (!_hasPendingTarget) return;
 
-        foreach (var entity in world.Query<PlayerTag, PlayerAttackData>())
+        foreach (var entity in world.Query<PlayerTag, CombatComponent>())
         {
-            var data = world.Get<PlayerAttackData>(entity);
+            var data = world.Get<CombatComponent>(entity);
             data.TargetPosition = _pendingTarget;
             data.HasTarget = true;
             world.Set(entity, data);

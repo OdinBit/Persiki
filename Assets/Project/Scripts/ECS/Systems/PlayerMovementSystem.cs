@@ -13,7 +13,7 @@ public class PlayerMovementSystem : IEcsSystem
     {
         foreach (var entity in world.Query<PlayerTag, Rigidbody2DComponent>())
         {
-            if (!world.TryGet(entity, out PlayerMovementData moveData)) continue;
+            if (!world.TryGet(entity, out MovementComponent moveData)) continue;
 
             Vector2 direction = moveData.IsMoving ? moveData.Direction : Vector2.zero;
             var rb = world.Get<Rigidbody2DComponent>(entity).Value;

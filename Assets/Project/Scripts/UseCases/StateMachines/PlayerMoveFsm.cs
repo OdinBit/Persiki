@@ -5,7 +5,7 @@ using UnityHFSM;
 public class PlayerMoveFsm
 {
     private StateMachine                        _fsm;
-    private PlayerMovementData                  _playerMovementFsmData;
+    private MovementComponent                  _playerMovementFsmData;
     private readonly IMovementService           _movementService;
     private readonly IKeyboardMoveInputService  _keyboardMoveInputService;
     private readonly Rigidbody2D                _player_rb;

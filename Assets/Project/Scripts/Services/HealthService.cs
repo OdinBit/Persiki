@@ -2,9 +2,9 @@ using Zenject;
 using UnityEngine;
 using System;
 
-public class HealthSystem : IHealthService
+public class HealthService : IHealthService
 {
-    public HealthSystem()
+    public HealthService()
     {
     }
 

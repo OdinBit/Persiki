@@ -1,13 +1,13 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Zenject;
-public class MouseAttackInputSystem : IMouseAttackInputService
+public class MouseAttackInputService : IMouseAttackInputService
 {
     private GameInput _gameInput;
 
     public System.Action<Vector3> OnAttackPressed { get; set; }
 
-    public MouseAttackInputSystem(GameInput gi)
+    public MouseAttackInputService(GameInput gi)
     {
         _gameInput = gi;
         _gameInput.Gameplay.Attack.performed += OnAttackInput;

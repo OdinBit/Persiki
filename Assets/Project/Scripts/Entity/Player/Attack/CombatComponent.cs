@@ -7,7 +7,7 @@ public enum EAttackStatus
     Cancelled
 }
 
-public struct PlayerAttackData
+public struct CombatComponent
 {
     public Vector2 TargetPosition;
     public bool HasTarget;

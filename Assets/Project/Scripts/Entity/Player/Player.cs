@@ -26,8 +26,8 @@ public class Player : MonoBehaviour
         _entity = _world.CreateEntity();
         _world.Add(_entity, new PlayerTag());
         _world.Add(_entity, new Rigidbody2DComponent { Value = _rb2d });
-        _world.Add(_entity, new PlayerMovementData { Direction = Vector2.zero, IsMoving = false });
-        _world.Add(_entity, new PlayerAttackData { AttackStatus = EAttackStatus.Finished, HasTarget = false });
+        _world.Add(_entity, new MovementComponent { Direction = Vector2.zero, IsMoving = false });
+        _world.Add(_entity, new CombatComponent { AttackStatus = EAttackStatus.Finished, HasTarget = false });
     }
 
     private void OnDestroy()

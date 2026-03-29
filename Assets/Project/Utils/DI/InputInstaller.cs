@@ -22,14 +22,14 @@ public class InputInstaller : MonoInstaller
     {
         Container
              .Bind<IMouseAttackInputService>()
-             .To<MouseAttackInputSystem>()
+             .To<MouseAttackInputService>()
              .AsSingle()
              .NonLazy();
     }
     private void BindKeyboardMoveInputHandler()
     {
         Container
-            .BindInterfacesTo<MovementInputHandler>()
+            .BindInterfacesTo<MovementInputService>()
             .AsSingle()
             .NonLazy();
     }

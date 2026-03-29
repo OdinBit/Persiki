@@ -2,13 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CombatSystem : ICombatService
+public class CombatService : ICombatService
 {
     private CombatStateMachine          _stateMachine;
     private CharacterContext            _context;
     private IMouseAttackInputService    _mouseAttackInputService;
 
-    public CombatSystem(IMouseAttackInputService mouseAttackInputService)
+    public CombatService(IMouseAttackInputService mouseAttackInputService)
     {
         _mouseAttackInputService = mouseAttackInputService;
         

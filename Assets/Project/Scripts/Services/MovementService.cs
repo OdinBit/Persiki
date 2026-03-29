@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public class PlayerMovement : IMovementService
+public class MovementService : IMovementService
 {
     [SerializeField] private float _speed = 5f;
 
-    public PlayerMovement(float speed)
+    public MovementService(float speed)
     {
         _speed = speed;
         Debug.Log("PlayerMovement initialized");

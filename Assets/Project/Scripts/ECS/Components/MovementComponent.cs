@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public struct PlayerMovementData
+public struct MovementComponent
 {
     public Vector2 Direction;    
     public bool IsMoving;                

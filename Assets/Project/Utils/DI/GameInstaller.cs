@@ -17,7 +17,7 @@ public class GameInstaller : MonoInstaller
     {
         Container
             .Bind<IDamageService>()
-            .To<DamageSystem>()
+            .To<DamageService>()
             .AsSingle();
     }
 
@@ -25,7 +25,7 @@ public class GameInstaller : MonoInstaller
     {
         Container
             .Bind<IHealthService>()
-            .To<HealthSystem>()
+            .To<HealthService>()
             .AsSingle();
     }
 
@@ -41,7 +41,7 @@ public class GameInstaller : MonoInstaller
     {
         Container
             .Bind<ICombatService>()
-            .To<CombatSystem>()
+            .To<CombatService>()
             .AsTransient();
     }
 

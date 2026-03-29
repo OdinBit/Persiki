@@ -1,21 +1,18 @@
 //#define DEBUG_MODE
-using CustomEventBus;
-using CustomEventBus.Signals;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityHFSM;
-
-public class PlayerAttackFsm
+public class CombatStateMachine
 {
     private readonly StateMachine _fsm;
-    private EventBus _eventBus;
-    private PlayerAttackData _playerAttackFsmData;
+    private CombatComponent _playerAttackFsmData;
+    private CharacterContext _ctx;
 
-    public PlayerAttackFsm(EventBus eventBus)
+    public CombatStateMachine(CharacterContext ctx)
     {
-        _eventBus = eventBus;
+        _ctx = ctx;
+
         _fsm = new StateMachine();
 
         _fsm.SetStartState("Passive");
@@ -23,19 +20,18 @@ public class PlayerAttackFsm
         _fsm.AddState("Passive",
             onEnter: state => FsmPassiveStateEnter(),
             onLogic: state => FsmPassiveState(),
-            onExit:  state => FsmPassiveStateExit());
+            onExit: state => FsmPassiveStateExit());
 
         _fsm.AddState("Attack",
             onEnter: state => FsmAttackStateEnter(),
             onLogic: state => FsmAttackState(),
-            onExit:  state => FsmAttackStateExit());
+            onExit: state => FsmAttackStateExit());
 
         _fsm.AddTransition("Passive", "Attack", FsmTransitionGuardPassiveToAttack);
         _fsm.AddTransition("Attack", "Passive", FsmTransitionGuardAttackToPassive);
 
         _fsm.Init();
 
-        _eventBus.Subscribe<PlayerAttackResponseSignal>(AttackFinished);
     }
 
     public void FsmRun()
@@ -77,7 +73,8 @@ public class PlayerAttackFsm
         Debug.Log("Attack onEnter");
 #endif
         _playerAttackFsmData.AttackStatus = EAttackStatus.InProgress;
-        _eventBus.Invoke(new PlayerAttackRequestSignal(_playerAttackFsmData.TargetPosition));
+        //_eventBus.Invoke(new PlayerAttackRequestSignal(_playerAttackFsmData.TargetPosition));
+        _playerAttackFsmData.AttackStatus = EAttackStatus.Finished; // temp
     }
     private void FsmAttackState()
     {
@@ -96,7 +93,7 @@ public class PlayerAttackFsm
     private bool FsmTransitionGuardPassiveToAttack(Transition<string> transition)
     {
         bool isTransitionAllowed = false;
-        if(_playerAttackFsmData.HasTarget) isTransitionAllowed = true;
+        if (_playerAttackFsmData.HasTarget) isTransitionAllowed = true;
         return isTransitionAllowed;
     }
 
