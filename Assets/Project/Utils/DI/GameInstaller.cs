@@ -74,5 +74,9 @@ public class GameInstaller : MonoInstaller
         Container
             .BindInterfacesTo<EcsFixedLoop>()
             .AsSingle();
+
+        Container
+            .Bind<CharacterAnimationSystem>()
+            .AsSingle();
     }
 }

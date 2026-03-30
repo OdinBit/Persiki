@@ -10,13 +10,15 @@ public class EcsUpdateLoop : ITickable
         EcsWorld world,
         PlayerMoveInputSystem moveInputSystem,
         PlayerAttackInputSystem attackInputSystem,
-        PlayerAttackSystem attackSystem)
+        PlayerAttackSystem attackSystem,
+        CharacterAnimationSystem animationSystem)
     {
         _world = world;
         _group = new EcsSystemGroup();
         _group.Add(moveInputSystem);
         _group.Add(attackInputSystem);
         _group.Add(attackSystem);
+        _group.Add(animationSystem);
     }
 
     public void Tick()

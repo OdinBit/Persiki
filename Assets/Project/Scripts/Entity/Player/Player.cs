@@ -2,11 +2,13 @@ using UnityEngine;
 using Zenject;
 
 [RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(Animator))]
 public class Player : MonoBehaviour
 {
     private EcsWorld _world;
     private EcsEntity _entity;
     private Rigidbody2D _rb2d;
+    private Animator _animator;
 
     [Inject]
     public void Construct(EcsWorld world)
@@ -16,7 +18,8 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
-        _rb2d = GetComponent<Rigidbody2D>();
+        _rb2d       = GetComponent<Rigidbody2D>();
+        _animator   = GetComponent<Animator>();
     }
 
     private void Start()
@@ -28,6 +31,8 @@ public class Player : MonoBehaviour
         _world.Add(_entity, new Rigidbody2DComponent { Value = _rb2d });
         _world.Add(_entity, new MovementComponent { Direction = Vector2.zero, IsMoving = false });
         _world.Add(_entity, new CombatComponent { AttackStatus = EAttackStatus.Finished, HasTarget = false });
+        _world.Add(_entity, new AnimatorComponent { animator = _animator });
+        _world.Add(_entity, new MoveAnimationComponent { IsRunning = false, IsFacingRight = true });
     }
 
     private void OnDestroy()
