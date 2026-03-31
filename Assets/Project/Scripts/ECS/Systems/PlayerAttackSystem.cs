@@ -1,40 +1,47 @@
-using System;
 using CustomEventBus;
 using CustomEventBus.Signals;
+using Leopotam.EcsLite;
 
-public class PlayerAttackSystem : IEcsSystem, System.IDisposable
+public class PlayerAttackSystem : IEcsInitSystem, IEcsRunSystem, IEcsDestroySystem
 {
     private readonly EventBus _eventBus;
     private bool _attackFinished;
+    private EcsFilter _filter;
+    private EcsPool<CombatComponent> _combatPool;
 
     public PlayerAttackSystem(EventBus eventBus)
     {
         _eventBus = eventBus;
+    }
+
+    public void Init(IEcsSystems systems)
+    {
+        var world = systems.GetWorld();
+        _filter = world.Filter<PlayerTag>().Inc<CombatComponent>().End();
+        _combatPool = world.GetPool<CombatComponent>();
         _eventBus.Subscribe<PlayerAttackResponseSignal>(OnAttackFinished);
     }
 
-    public void Update(EcsWorld world, float deltaTime)
+    public void Run(IEcsSystems systems)
     {
         if (_attackFinished)
         {
-            foreach (var entity in world.Query<PlayerTag, CombatComponent>())
+            foreach (var entity in _filter)
             {
-                var data = world.Get<CombatComponent>(entity);
+                ref var data = ref _combatPool.Get(entity);
                 data.AttackStatus = EAttackStatus.Finished;
                 data.HasTarget = false;
-                world.Set(entity, data);
             }
             _attackFinished = false;
         }
 
-        foreach (var entity in world.Query<PlayerTag, CombatComponent>())
+        foreach (var entity in _filter)
         {
-            var data = world.Get<CombatComponent>(entity);
+            ref var data = ref _combatPool.Get(entity);
             if (!data.HasTarget) continue;
             if (data.AttackStatus == EAttackStatus.InProgress) continue;
 
             data.AttackStatus = EAttackStatus.InProgress;
-            world.Set(entity, data);
             _eventBus.Invoke(new PlayerAttackRequestSignal(data.TargetPosition));
         }
     }
@@ -44,7 +51,7 @@ public class PlayerAttackSystem : IEcsSystem, System.IDisposable
         _attackFinished = true;
     }
 
-    public void Dispose()
+    public void Destroy(IEcsSystems systems)
     {
         _eventBus.Unsubscribe<PlayerAttackResponseSignal>(OnAttackFinished);
     }

@@ -1,26 +1,44 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using Leopotam.EcsLite;
 
-public class CharacterAnimationSystem : IEcsSystem
+public class CharacterAnimationSystem : IEcsInitSystem, IEcsRunSystem
 {
-    public void Update(EcsWorld world, float deltaTime)
+    private EcsFilter _filter;
+    private EcsPool<MovementComponent> _movePool;
+    private EcsPool<AnimatorComponent> _animPool;
+    private EcsPool<MoveAnimationComponent> _animStatePool;
+
+    public void Init(IEcsSystems systems)
     {
+        var world       = systems.GetWorld();
+        _filter         = world.Filter<AnimatorComponent>().Inc<MovementComponent>().End();
+        _movePool       = world.GetPool<MovementComponent>();
+        _animPool       = world.GetPool<AnimatorComponent>();
+        _animStatePool  = world.GetPool<MoveAnimationComponent>();
+    }
 
-        foreach (var entity in world.Query<AnimatorComponent, MovementComponent>())
+    public void Run(IEcsSystems systems)
+    {
+        foreach (var entity in _filter)
         {
-            var movement_data = world.Get<MovementComponent>(entity);
-            var animation_data = world.Get<AnimatorComponent>(entity);
+            ref var movementData = ref _movePool.Get(entity);
+            ref var animatorData = ref _animPool.Get(entity);
 
-            if (animation_data.animator == null) continue;
+            if (animatorData.animator == null) continue;
 
-            if (!world.TryGet(entity, out MoveAnimationComponent moveAnim))
+            bool hasAnimState = _animStatePool.Has(entity);
+            ref var moveAnim = ref (hasAnimState
+                ? ref _animStatePool.Get(entity)
+                : ref _animStatePool.Add(entity));
+
+            if (!hasAnimState)
             {
-                moveAnim = new MoveAnimationComponent { IsRunning = false, IsFacingRight = true };
+                moveAnim.IsRunning = false;
+                moveAnim.IsFacingRight = true;
             }
 
-            bool shouldRun = movement_data.IsMoving;
-            float dirX = movement_data.Direction.x;
+            bool shouldRun = movementData.IsMoving;
+            float dirX = movementData.Direction.x;
             bool hasHorizontalInput = Mathf.Abs(dirX) > 0.01f;
 
             if (hasHorizontalInput)
@@ -32,17 +50,12 @@ public class CharacterAnimationSystem : IEcsSystem
                 ? (moveAnim.IsFacingRight ? "RUN_RIGHT" : "RUN_LEFT")
                 : (moveAnim.IsFacingRight ? "IDLE_RIGHT" : "IDLE_LEFT");
 
-            if (!animation_data.animator.GetCurrentAnimatorStateInfo(0).IsName(targetState))
+            if (!animatorData.animator.GetCurrentAnimatorStateInfo(0).IsName(targetState))
             {
-                animation_data.animator.Play(targetState, 0);
+                animatorData.animator.Play(targetState, 0);
             }
 
-            if (moveAnim.IsRunning != shouldRun)
-            {
-                moveAnim.IsRunning = shouldRun;
-            }
-
-            world.Set(entity, moveAnim);
+            moveAnim.IsRunning = shouldRun;
         }
     }
 }

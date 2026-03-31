@@ -1,28 +1,36 @@
-using System;
 using UnityEngine;
+using Leopotam.EcsLite;
 
-public class PlayerAttackInputSystem : IEcsSystem, IDisposable
+public class PlayerAttackInputSystem : IEcsInitSystem, IEcsRunSystem, IEcsDestroySystem
 {
     private readonly IMouseAttackInputService _mouseAttackInputService;
     private bool _hasPendingTarget;
     private Vector2 _pendingTarget;
+    private EcsFilter _filter;
+    private EcsPool<CombatComponent> _combatPool;
 
     public PlayerAttackInputSystem(IMouseAttackInputService mouseAttackInputService)
     {
         _mouseAttackInputService = mouseAttackInputService;
+    }
+
+    public void Init(IEcsSystems systems)
+    {
+        var world = systems.GetWorld();
+        _filter = world.Filter<PlayerTag>().Inc<CombatComponent>().End();
+        _combatPool = world.GetPool<CombatComponent>();
         _mouseAttackInputService.OnAttackPressed += OnAttackPressed;
     }
 
-    public void Update(EcsWorld world, float deltaTime)
+    public void Run(IEcsSystems systems)
     {
         if (!_hasPendingTarget) return;
 
-        foreach (var entity in world.Query<PlayerTag, CombatComponent>())
+        foreach (var entity in _filter)
         {
-            var data = world.Get<CombatComponent>(entity);
+            ref var data = ref _combatPool.Get(entity);
             data.TargetPosition = _pendingTarget;
             data.HasTarget = true;
-            world.Set(entity, data);
         }
 
         _hasPendingTarget = false;
@@ -34,7 +42,7 @@ public class PlayerAttackInputSystem : IEcsSystem, IDisposable
         _hasPendingTarget = true;
     }
 
-    public void Dispose()
+    public void Destroy(IEcsSystems systems)
     {
         _mouseAttackInputService.OnAttackPressed -= OnAttackPressed;
     }

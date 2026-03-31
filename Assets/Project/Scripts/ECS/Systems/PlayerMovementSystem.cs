@@ -1,23 +1,34 @@
 using UnityEngine;
+using Leopotam.EcsLite;
 
-public class PlayerMovementSystem : IEcsSystem
+public class PlayerMovementSystem : IEcsInitSystem, IEcsRunSystem
 {
     private readonly IMovementService _movementService;
+    private EcsFilter _filter;
+    private EcsPool<Rigidbody2DComponent> _rbPool;
+    private EcsPool<MovementComponent> _movePool;
 
     public PlayerMovementSystem(IMovementService movementService)
     {
         _movementService = movementService;
     }
 
-    public void Update(EcsWorld world, float deltaTime)
+    public void Init(IEcsSystems systems)
     {
-        foreach (var entity in world.Query<PlayerTag, Rigidbody2DComponent>())
-        {
-            if (!world.TryGet(entity, out MovementComponent moveData)) continue;
+        var world = systems.GetWorld();
+        _filter = world.Filter<PlayerTag>().Inc<Rigidbody2DComponent>().Inc<MovementComponent>().End();
+        _rbPool = world.GetPool<Rigidbody2DComponent>();
+        _movePool = world.GetPool<MovementComponent>();
+    }
 
+    public void Run(IEcsSystems systems)
+    {
+        foreach (var entity in _filter)
+        {
+            ref var moveData = ref _movePool.Get(entity);
             Vector2 direction = moveData.IsMoving ? moveData.Direction : Vector2.zero;
-            var rb = world.Get<Rigidbody2DComponent>(entity).Value;
-            _movementService.MoveToDirection(rb, direction);
+            ref var rbComp = ref _rbPool.Get(entity);
+            _movementService.MoveToDirection(rbComp.Value, direction);
         }
     }
 }
