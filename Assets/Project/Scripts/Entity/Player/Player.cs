@@ -1,12 +1,15 @@
 using UnityEngine;
 using Zenject;
+using Leopotam.EcsLite;
 
 [RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(Animator))]
 public class Player : MonoBehaviour
 {
     private EcsWorld _world;
-    private EcsEntity _entity;
+    private int _entity;
     private Rigidbody2D _rb2d;
+    private Animator _animator;
 
     [Inject]
     public void Construct(EcsWorld world)
@@ -16,25 +19,42 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
-        _rb2d = GetComponent<Rigidbody2D>();
+        _rb2d       = GetComponent<Rigidbody2D>();
+        _animator   = GetComponent<Animator>();
     }
 
     private void Start()
     {
         if (_world == null) return;
 
-        _entity = _world.CreateEntity();
-        _world.Add(_entity, new PlayerTag());
-        _world.Add(_entity, new Rigidbody2DComponent { Value = _rb2d });
-        _world.Add(_entity, new MovementComponent { Direction = Vector2.zero, IsMoving = false });
-        _world.Add(_entity, new CombatComponent { AttackStatus = EAttackStatus.Finished, HasTarget = false });
+        _entity = _world.NewEntity();
+
+        _world.GetPool<PlayerTag>().Add(_entity);
+
+        ref var rbComp          = ref _world.GetPool<Rigidbody2DComponent>().Add(_entity);
+        rbComp.Value            = _rb2d;
+
+        ref var move            = ref _world.GetPool<MovementComponent>().Add(_entity);
+        move.Direction          = Vector2.zero;
+        move.IsMoving           = false;
+
+        ref var combat          = ref _world.GetPool<CombatComponent>().Add(_entity);
+        combat.AttackStatus     = EAttackStatus.Finished;
+        combat.HasTarget        = false;
+
+        ref var anim            = ref _world.GetPool<AnimatorComponent>().Add(_entity);
+        anim.animator           = _animator;
+
+        ref var moveAnim        = ref _world.GetPool<MoveAnimationComponent>().Add(_entity);
+        moveAnim.IsRunning      = false;
+        moveAnim.IsFacingRight  = true;
     }
 
     private void OnDestroy()
     {
-        if (_world != null && _entity.IsValid)
+        if (_world != null && _world.IsAlive() && _entity >= 0)
         {
-            _world.DestroyEntity(_entity);
+            _world.DelEntity(_entity);
         }
     }
 

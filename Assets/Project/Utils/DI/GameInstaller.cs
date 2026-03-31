@@ -48,31 +48,11 @@ public class GameInstaller : MonoInstaller
     private void BindEcs()
     {
         Container
-            .Bind<EcsWorld>()
+            .Bind<Leopotam.EcsLite.EcsWorld>()
             .AsSingle();
 
         Container
-            .Bind<PlayerMoveInputSystem>()
-            .AsSingle();
-
-        Container
-            .Bind<PlayerMovementSystem>()
-            .AsSingle();
-
-        Container
-            .Bind<PlayerAttackInputSystem>()
-            .AsSingle();
-
-        Container
-            .Bind<PlayerAttackSystem>()
-            .AsSingle();
-
-        Container
-            .BindInterfacesTo<EcsUpdateLoop>()
-            .AsSingle();
-
-        Container
-            .BindInterfacesTo<EcsFixedLoop>()
+            .BindInterfacesTo<EcsStartup>()
             .AsSingle();
     }
 }
