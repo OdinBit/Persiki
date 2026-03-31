@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 using Leopotam.EcsLite;
+using UnityEngine.UIElements;
 
 public class Cursor : MonoBehaviour
 {
@@ -18,7 +19,8 @@ public class Cursor : MonoBehaviour
 
     private void Awake()
     {
-
+        UnityEngine.Cursor.visible = false;
+        UnityEngine.Cursor.lockState = CursorLockMode.None;
     }
 
     private void Start()
