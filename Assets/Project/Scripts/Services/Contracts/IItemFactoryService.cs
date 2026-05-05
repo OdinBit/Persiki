@@ -5,5 +5,5 @@ using UnityEngine;
 public interface IItemFactoryService
 {
     public void Load();
-    public void Create(ItemMarker marker);
+    public void Create(ItemMarker marker, int ownerEntity);
 }

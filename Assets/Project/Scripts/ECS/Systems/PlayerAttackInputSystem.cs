@@ -7,7 +7,7 @@ public class PlayerAttackInputSystem : IEcsInitSystem, IEcsRunSystem, IEcsDestro
     private bool _hasPendingTarget;
     private Vector2 _pendingTarget;
     private EcsFilter _filter;
-    private EcsPool<CombatComponent> _combatPool;
+    private EcsPool<AttackRequestComponent> _attackRequestPool;
 
     public PlayerAttackInputSystem(IMouseAttackInputService mouseAttackInputService)
     {
@@ -17,8 +17,8 @@ public class PlayerAttackInputSystem : IEcsInitSystem, IEcsRunSystem, IEcsDestro
     public void Init(IEcsSystems systems)
     {
         var world = systems.GetWorld();
-        _filter = world.Filter<PlayerTag>().Inc<CombatComponent>().End();
-        _combatPool = world.GetPool<CombatComponent>();
+        _filter = world.Filter<PlayerTag>().Inc<InventoryComponent>().End();
+        _attackRequestPool = world.GetPool<AttackRequestComponent>();
         _mouseAttackInputService.OnAttackPressed += OnAttackPressed;
     }
 
@@ -28,9 +28,13 @@ public class PlayerAttackInputSystem : IEcsInitSystem, IEcsRunSystem, IEcsDestro
 
         foreach (var entity in _filter)
         {
-            ref var data = ref _combatPool.Get(entity);
-            data.TargetPosition = _pendingTarget;
-            data.HasTarget = true;
+            if (!_attackRequestPool.Has(entity))
+            {
+                _attackRequestPool.Add(entity);
+            }
+
+            ref var attackRequest = ref _attackRequestPool.Get(entity);
+            attackRequest.TargetPosition = _pendingTarget;
         }
 
         _hasPendingTarget = false;

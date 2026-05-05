@@ -18,13 +18,18 @@ public class ItemFactory : IItemFactoryService
     {
         _simpleSwordPrefab = Resources.Load(SimpleSwordPath);
     }
-    public void Create(ItemMarker marker)
+    public void Create(ItemMarker marker, int ownerEntity)
     {
-        _diContainer.InstantiatePrefab(_simpleSwordPrefab, 
-                                        marker.transform.position, 
-                                        Quaternion.identity, 
-                                        marker.transform);
-    
+        var item = _diContainer.InstantiatePrefab(
+            _simpleSwordPrefab,
+            marker.transform.position,
+            Quaternion.identity,
+            marker.transform);
+
+        if (item.TryGetComponent<SimpleSword>(out var simpleSword))
+        {
+            simpleSword.SetOwnerEntity(ownerEntity);
+        }
     }
 
 }

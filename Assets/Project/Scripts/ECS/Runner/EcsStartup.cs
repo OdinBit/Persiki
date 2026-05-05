@@ -10,7 +10,6 @@ public class EcsStartup : IInitializable, ITickable, IFixedTickable, IDisposable
     private readonly IMousePositionService _mousePositionService;
     private readonly IMovementService _movementService;
     private readonly IItemFactoryService _itemFactoryService;
-    private readonly CustomEventBus.EventBus _eventBus;
 
     private IEcsSystems _updateSystems;
     private IEcsSystems _fixedSystems;
@@ -21,15 +20,13 @@ public class EcsStartup : IInitializable, ITickable, IFixedTickable, IDisposable
         IMouseAttackInputService mouseAttackInputService,
         IMousePositionService mousePositionService,
         IMovementService movementService,
-        IItemFactoryService itemFactoryService,
-        CustomEventBus.EventBus eventBus)
+        IItemFactoryService itemFactoryService)
     {
         _world                      = world;
         _keyboardMoveInputService   = keyboardMoveInputService;
         _mouseAttackInputService    = mouseAttackInputService;
         _mousePositionService       = mousePositionService;
         _movementService            = movementService;
-        _eventBus                   = eventBus;
         _itemFactoryService         = itemFactoryService;
     }
 
@@ -38,11 +35,11 @@ public class EcsStartup : IInitializable, ITickable, IFixedTickable, IDisposable
         _updateSystems = new EcsSystems(_world)
             .Add(new PlayerMoveInputSystem(_keyboardMoveInputService))
             .Add(new PlayerAttackInputSystem(_mouseAttackInputService))
-            .Add(new PlayerAttackSystem(_eventBus))
             .Add(new CharacterAnimationSystem())
             .Add(new CursorInputSystem(_mousePositionService))
             .Add(new CursorVisualSystem())
-            .Add(new ItemSetupSystem(_itemFactoryService));
+            .Add(new ItemSetupSystem(_itemFactoryService))
+            .Add(new WeaponAttackRequestSystem());
 
         _updateSystems.Init();
 

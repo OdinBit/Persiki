@@ -4,9 +4,8 @@ public class ItemSetupSystem : IEcsInitSystem, IEcsRunSystem
 {
     private EcsFilter _filter;
     private EcsPool<ItemMarkerComponent> _itemMarkerPool;
+    private EcsPool<ItemSpawnedComponent> _itemSpawnedPool;
     private IItemFactoryService _itemFactoryService;
-
-    private bool _receiveItemCreateRequest = true;
 
     public ItemSetupSystem(IItemFactoryService itemFactoryService)
     {
@@ -18,6 +17,7 @@ public class ItemSetupSystem : IEcsInitSystem, IEcsRunSystem
         var world       = systems.GetWorld();
         _filter         = world.Filter<ItemMarkerComponent>().Inc<InventoryComponent>().End();
         _itemMarkerPool = world.GetPool<ItemMarkerComponent>();
+        _itemSpawnedPool = world.GetPool<ItemSpawnedComponent>();
 
         _itemFactoryService.Load();
 
@@ -27,17 +27,19 @@ public class ItemSetupSystem : IEcsInitSystem, IEcsRunSystem
     {
         foreach (var entity in _filter)
         {
-            if(_receiveItemCreateRequest == true)
+            if (_itemSpawnedPool.Has(entity))
             {
-                _receiveItemCreateRequest = false;
-                ref var itemMarkerComponent = ref _itemMarkerPool.Get(entity);
-                if(itemMarkerComponent.marker != null)
-                {
-                    _itemFactoryService.Create(itemMarkerComponent.marker);
-                }
-                
+                continue;
             }
-            
+
+            ref var itemMarkerComponent = ref _itemMarkerPool.Get(entity);
+            if (itemMarkerComponent.marker == null)
+            {
+                continue;
+            }
+
+            _itemFactoryService.Create(itemMarkerComponent.marker, entity);
+            _itemSpawnedPool.Add(entity);
         }
     }
 }
