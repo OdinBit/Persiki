@@ -55,6 +55,13 @@ public class Player : MonoBehaviour
 
         ref var itemMarker      = ref _world.GetPool<ItemMarkerComponent>().Add(_entity);
         itemMarker.marker       = _itemMarker;
+
+        if (_itemMarker != null)
+        {
+            ref var itemMarkerFacing = ref _world.GetPool<ItemMarkerFacingComponent>().Add(_entity);
+            itemMarkerFacing.BaseLocalPosition = _itemMarker.transform.localPosition;
+            itemMarkerFacing.BaseLocalScale = _itemMarker.transform.localScale;
+        }
     }
 
     private void OnDestroy()
