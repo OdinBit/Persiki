@@ -10,6 +10,7 @@ public class Player : MonoBehaviour
     private int _entity;
     private Rigidbody2D _rb2d;
     private Animator _animator;
+    private ItemMarker _itemMarker;
 
     [Inject]
     public void Construct(EcsWorld world)
@@ -21,6 +22,7 @@ public class Player : MonoBehaviour
     {
         _rb2d       = GetComponent<Rigidbody2D>();
         _animator   = GetComponent<Animator>();
+        _itemMarker = GetComponentInChildren<ItemMarker>();
     }
 
     private void Start()
@@ -48,6 +50,11 @@ public class Player : MonoBehaviour
         ref var moveAnim        = ref _world.GetPool<MoveAnimationComponent>().Add(_entity);
         moveAnim.IsRunning      = false;
         moveAnim.IsFacingRight  = true;
+
+        ref var inventory       = ref _world.GetPool<InventoryComponent>().Add(_entity);
+
+        ref var itemMarker      = ref _world.GetPool<ItemMarkerComponent>().Add(_entity);
+        itemMarker.marker       = _itemMarker;
     }
 
     private void OnDestroy()

@@ -11,8 +11,16 @@ public class GameInstaller : MonoInstaller
         BindHealthService();
         BindCombatService();
         BindEcs();
+        BindItemFactory();
     }
 
+    private void BindItemFactory()
+    {
+        Container
+            .Bind<IItemFactoryService>()
+            .To<ItemFactory>()
+            .AsSingle();
+    }
     private void BindDamageService()
     {
         Container

@@ -28426,11 +28426,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 8436793585662584411, guid: c25e74328153e9045a732f1e6073d18d,
-        type: 3}
-      propertyPath: _pinToCursore
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
