@@ -3,11 +3,14 @@ using Leopotam.EcsLite;
 
 public class PlayerAttackInputSystem : IEcsInitSystem, IEcsRunSystem, IEcsDestroySystem
 {
+    private const float AttackFacingDuration = 0.2f;
+
     private readonly IMouseAttackInputService _mouseAttackInputService;
     private bool _hasPendingTarget;
     private Vector2 _pendingTarget;
     private EcsFilter _filter;
     private EcsPool<AttackRequestComponent> _attackRequestPool;
+    private EcsPool<AttackFacingComponent> _attackFacingPool;
 
     public PlayerAttackInputSystem(IMouseAttackInputService mouseAttackInputService)
     {
@@ -19,6 +22,7 @@ public class PlayerAttackInputSystem : IEcsInitSystem, IEcsRunSystem, IEcsDestro
         var world = systems.GetWorld();
         _filter = world.Filter<PlayerTag>().Inc<InventoryComponent>().End();
         _attackRequestPool = world.GetPool<AttackRequestComponent>();
+        _attackFacingPool = world.GetPool<AttackFacingComponent>();
         _mouseAttackInputService.OnAttackPressed += OnAttackPressed;
     }
 
@@ -35,6 +39,15 @@ public class PlayerAttackInputSystem : IEcsInitSystem, IEcsRunSystem, IEcsDestro
 
             ref var attackRequest = ref _attackRequestPool.Get(entity);
             attackRequest.TargetPosition = _pendingTarget;
+
+            if (!_attackFacingPool.Has(entity))
+            {
+                _attackFacingPool.Add(entity);
+            }
+
+            ref var attackFacing = ref _attackFacingPool.Get(entity);
+            attackFacing.TargetPosition = _pendingTarget;
+            attackFacing.TimeRemaining = AttackFacingDuration;
         }
 
         _hasPendingTarget = false;

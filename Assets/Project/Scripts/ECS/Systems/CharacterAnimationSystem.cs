@@ -7,6 +7,7 @@ public class CharacterAnimationSystem : IEcsInitSystem, IEcsRunSystem
     private EcsPool<MovementComponent> _movePool;
     private EcsPool<AnimatorComponent> _animPool;
     private EcsPool<MoveAnimationComponent> _animStatePool;
+    private EcsPool<AttackFacingComponent> _attackFacingPool;
 
     public void Init(IEcsSystems systems)
     {
@@ -15,6 +16,7 @@ public class CharacterAnimationSystem : IEcsInitSystem, IEcsRunSystem
         _movePool       = world.GetPool<MovementComponent>();
         _animPool       = world.GetPool<AnimatorComponent>();
         _animStatePool  = world.GetPool<MoveAnimationComponent>();
+        _attackFacingPool = world.GetPool<AttackFacingComponent>();
     }
 
     public void Run(IEcsSystems systems)
@@ -40,8 +42,26 @@ public class CharacterAnimationSystem : IEcsInitSystem, IEcsRunSystem
             bool shouldRun = movementData.IsMoving;
             float dirX = movementData.Direction.x;
             bool hasHorizontalInput = Mathf.Abs(dirX) > 0.01f;
+            bool hasAttackFacing = _attackFacingPool.Has(entity);
 
-            if (hasHorizontalInput)
+            if (hasAttackFacing)
+            {
+                ref var attackFacing = ref _attackFacingPool.Get(entity);
+                attackFacing.TimeRemaining -= Time.deltaTime;
+
+                float attackDirX = attackFacing.TargetPosition.x - animatorData.animator.transform.position.x;
+                if (Mathf.Abs(attackDirX) > 0.01f)
+                {
+                    moveAnim.IsFacingRight = attackDirX > 0f;
+                }
+
+                if (attackFacing.TimeRemaining <= 0f)
+                {
+                    _attackFacingPool.Del(entity);
+                }
+            }
+
+            if (!hasAttackFacing && hasHorizontalInput)
             {
                 moveAnim.IsFacingRight = dirX > 0f;
             }
