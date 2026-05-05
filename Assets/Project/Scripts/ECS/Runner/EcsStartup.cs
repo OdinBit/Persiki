@@ -39,7 +39,10 @@ public class EcsStartup : IInitializable, ITickable, IFixedTickable, IDisposable
             .Add(new CursorInputSystem(_mousePositionService))
             .Add(new CursorVisualSystem())
             .Add(new ItemSetupSystem(_itemFactoryService))
-            .Add(new WeaponAttackRequestSystem());
+            .Add(new WeaponAttackRequestSystem())
+            .Add(new MeleeWeaponAttackSystem())
+            .Add(new RangedWeaponAttackSystem())
+            .Add(new MeleeWeaponAnimationSystem());
 
         _updateSystems.Init();
 

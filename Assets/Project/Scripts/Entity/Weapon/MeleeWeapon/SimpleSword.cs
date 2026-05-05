@@ -36,16 +36,18 @@ public class SimpleSword : MonoBehaviour
 
         _entity = _world.NewEntity();
 
-        ref var animComponent = ref _world.GetPool<AnimatorComponent>().Add(_entity);
-        animComponent.animator = _animator;
+        ref var animComponent           = ref _world.GetPool<AnimatorComponent>().Add(_entity);
+        animComponent.animator          = _animator;
 
-        ref var transformComponent = ref _world.GetPool<TransformComponent>().Add(_entity);
-        transformComponent.Transform = _transform;
+        ref var transformComponent      = ref _world.GetPool<TransformComponent>().Add(_entity);
+        transformComponent.Transform    = _transform;
 
-        ref var itemOwnerComponent = ref _world.GetPool<ItemOwnerComponent>().Add(_entity);
-        itemOwnerComponent.OwnerEntity = _ownerEntity;
+        ref var itemOwnerComponent      = ref _world.GetPool<ItemOwnerComponent>().Add(_entity);
+        itemOwnerComponent.OwnerEntity  = _ownerEntity;
 
-        _world.GetPool<WeaponItemComponent>().Add(_entity);
+        ref var weaponItemComponent     = ref _world.GetPool<WeaponItemComponent>().Add(_entity);
+
+        ref var meleeWeaponComponent    = ref _world.GetPool<MeleeWeaponComponent>().Add(_entity);
     }
 
     private void OnDestroy()

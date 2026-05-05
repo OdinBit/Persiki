@@ -1,5 +1,4 @@
 using Leopotam.EcsLite;
-using UnityEngine;
 
 public class WeaponAttackRequestSystem : IEcsInitSystem, IEcsRunSystem
 {
@@ -7,16 +6,16 @@ public class WeaponAttackRequestSystem : IEcsInitSystem, IEcsRunSystem
     private EcsFilter _weaponFilter;
     private EcsPool<AttackRequestComponent> _attackRequestPool;
     private EcsPool<ItemOwnerComponent> _itemOwnerPool;
-    private EcsPool<TransformComponent> _transformPool;
+    private EcsPool<WeaponAttackCommandComponent> _weaponAttackCommandPool;
 
     public void Init(IEcsSystems systems)
     {
-        var world = systems.GetWorld();
-        _ownerFilter = world.Filter<InventoryComponent>().Inc<AttackRequestComponent>().End();
-        _weaponFilter = world.Filter<WeaponItemComponent>().Inc<ItemOwnerComponent>().Inc<TransformComponent>().End();
-        _attackRequestPool = world.GetPool<AttackRequestComponent>();
-        _itemOwnerPool = world.GetPool<ItemOwnerComponent>();
-        _transformPool = world.GetPool<TransformComponent>();
+        var world                   = systems.GetWorld();
+        _ownerFilter                = world.Filter<InventoryComponent>().Inc<AttackRequestComponent>().End();
+        _weaponFilter               = world.Filter<WeaponItemComponent>().Inc<ItemOwnerComponent>().End();
+        _attackRequestPool          = world.GetPool<AttackRequestComponent>();
+        _itemOwnerPool              = world.GetPool<ItemOwnerComponent>();
+        _weaponAttackCommandPool    = world.GetPool<WeaponAttackCommandComponent>();
     }
 
     public void Run(IEcsSystems systems)
@@ -33,8 +32,13 @@ public class WeaponAttackRequestSystem : IEcsInitSystem, IEcsRunSystem
                     continue;
                 }
 
-                Debug.Log(
-                    $"Attack request received. OwnerEntity={ownerEntity}, WeaponEntity={weaponEntity}, Target={attackRequest.TargetPosition}");
+                if (!_weaponAttackCommandPool.Has(weaponEntity))
+                {
+                    _weaponAttackCommandPool.Add(weaponEntity);
+                }
+
+                ref var weaponAttackCommand = ref _weaponAttackCommandPool.Get(weaponEntity);
+                weaponAttackCommand.TargetPosition = attackRequest.TargetPosition;
             }
 
             _attackRequestPool.Del(ownerEntity);
